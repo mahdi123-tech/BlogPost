@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
 import { getSummaryAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
@@ -79,7 +79,7 @@ function SubmitButton() {
 }
 
 export default function Home() {
-  const [state, formAction] = useFormState(getSummaryAction, initialState);
+  const [state, formAction] = useActionState(getSummaryAction, initialState);
   const { toast } = useToast();
   
   const articleImage = PlaceHolderImages.find(img => img.id === 'ai-ml-abstract');
