@@ -81,6 +81,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  @screen lg {
+    * {
+      cursor: none;
+    }
+  }
 }
 
 @layer components {

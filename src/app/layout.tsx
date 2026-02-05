@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
+import { CustomCursor } from '@/components/CustomCursor';
 
 export const metadata: Metadata = {
   title: 'AI Insights Hub',
@@ -28,6 +29,7 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased')}>
+        <CustomCursor />
         {children}
         <Toaster />
       </body>

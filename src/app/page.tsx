@@ -15,6 +15,7 @@ import {
   Share2,
   Maximize,
   Minimize,
+  ChevronDown,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShareDialog } from '@/components/ShareDialog';
@@ -144,6 +145,7 @@ export default function Home() {
   const [isShareDialogOpen, setShareDialogOpen] = useState(false);
   const articleRef = useRef<HTMLDivElement>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showScroll, setShowScroll] = useState(true);
 
   const articleImage = PlaceHolderImages.find(
     (img) => img.id === 'ai-ml-abstract'
@@ -182,6 +184,18 @@ export default function Home() {
       });
     }
   }, [state, toast]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowScroll(false);
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
@@ -223,6 +237,13 @@ export default function Home() {
                   className="object-cover"
                   data-ai-hint={articleImage.imageHint}
                 />
+                {showScroll && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-black/50 animate-bounce">
+                      <ChevronDown className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -268,7 +289,7 @@ export default function Home() {
 
         <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
           <div className="brutalist-card !shadow-[6px_6px_0_#999] !p-4">
-            <p>Created by you!</p>
+            <p>Created by Louati Mahdi</p>
           </div>
         </footer>
       </main>
