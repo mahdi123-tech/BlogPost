@@ -143,19 +143,8 @@ export default function Home() {
        <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
         <div className="brutalist-card !shadow-[6px_6px_0_#999] !p-4">
           <p>
-            Design inspired by a{" "}
-            <a
-              href="https://uiverse.io/0xnihilism/nasty-dingo-90"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold underline text-primary hover:text-accent"
-            >
-              brutalist card from uiverse.io
-              <ExternalLink className="inline-block ml-1 h-4 w-4" />
-            </a>
-            .
+            Created by Louati Mahdi
           </p>
-          <p>Built with Next.js, Tailwind CSS, and Genkit.</p>
         </div>
       </footer>
 
