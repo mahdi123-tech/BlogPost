@@ -6,8 +6,9 @@ import { getSummaryAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Loader2, BrainCircuit, Lightbulb, Clipboard, Check } from 'lucide-react';
+import { Loader2, BrainCircuit, Lightbulb, Clipboard, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ShareDialog } from '@/components/ShareDialog';
 
 const articlePart1 = `
 <h2>The Dawn of a New Era</h2>
@@ -58,6 +59,7 @@ const articlePart2 = `
 <p>The latest revolution is Generative AI. These are models, like Large Language Models (LLMs), that can create new content—text, images, music, and code. They are trained on vast amounts of data and learn the underlying patterns to a degree that they can generate novel, coherent, and often surprising outputs. This technology is what powers tools like ChatGPT and is fundamentally changing how we interact with information and create content.</p>
 `;
 
+const articleTitle = "The Brutalist's Guide to Modern AI";
 const textForSummary = ((articlePart1 + articlePart2).replace(/<[^>]*>?/gm, '')) + codeSnippet;
 
 
@@ -73,7 +75,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" aria-disabled={pending} className="brutalist-button brutalist-button-accent">
+    <Button type="submit" aria-disabled={pending} className="brutalist-button brutalist-button-accent w-full">
       {pending ? (
         <>
           <Loader2 className="mr-2 h-6 w-6 animate-spin" />
@@ -116,6 +118,7 @@ function CodeSnippet({ code }: { code: string }) {
 export default function Home() {
   const [state, formAction] = useActionState(getSummaryAction, initialState);
   const { toast } = useToast();
+  const [isShareDialogOpen, setShareDialogOpen] = useState(false);
   
   const articleImage = PlaceHolderImages.find(img => img.id === 'ai-ml-abstract');
 
@@ -130,63 +133,77 @@ export default function Home() {
   }, [state, toast]);
 
   return (
-    <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
-      <div className="w-full max-w-4xl">
-        <div className="brutalist-card">
-          <header className="brutalist-header">
-            <div className="brutalist-icon">
-              <BrainCircuit stroke="white" fill="white" />
-            </div>
-            <h1 className="brutalist-title">The Brutalist's Guide to Modern AI</h1>
-          </header>
-
-          {articleImage && (
-             <div className="relative w-full h-48 sm:h-80 border-4 border-black my-6 shadow-[8px_8px_0_#000]">
-                <Image 
-                  src={articleImage.imageUrl}
-                  alt={articleImage.description}
-                  fill
-                  className="object-cover"
-                  data-ai-hint={articleImage.imageHint}
-                />
-             </div>
-          )}
-
-          <div className="brutalist-content">
-            <div dangerouslySetInnerHTML={{ __html: articlePart1 }} />
-            <CodeSnippet code={codeSnippet} />
-            <div dangerouslySetInnerHTML={{ __html: articlePart2 }} />
-          </div>
-
-          <footer className="mt-6 pt-6 border-t-4 border-black">
-            <form action={formAction}>
-              <input type="hidden" name="articleContent" value={textForSummary} />
-              <SubmitButton />
-            </form>
-          </footer>
-        </div>
-
-        {state?.summary && (
-          <div className="brutalist-card mt-12" role="alert">
+    <>
+      <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
+        <div className="w-full max-w-4xl">
+          <div className="brutalist-card">
             <header className="brutalist-header">
               <div className="brutalist-icon">
-                <Lightbulb stroke="white" fill="white" />
+                <BrainCircuit stroke="white" fill="white" />
               </div>
-              <h2 className="brutalist-title">AI Summary</h2>
+              <h1 className="brutalist-title">{articleTitle}</h1>
             </header>
-            <p className="brutalist-content text-lg">{state.summary}</p>
+
+            {articleImage && (
+              <div className="relative w-full h-48 sm:h-80 border-4 border-black my-6 shadow-[8px_8px_0_#000]">
+                  <Image 
+                    src={articleImage.imageUrl}
+                    alt={articleImage.description}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={articleImage.imageHint}
+                  />
+              </div>
+            )}
+
+            <div className="brutalist-content">
+              <div dangerouslySetInnerHTML={{ __html: articlePart1 }} />
+              <CodeSnippet code={codeSnippet} />
+              <div dangerouslySetInnerHTML={{ __html: articlePart2 }} />
+            </div>
+
+            <footer className="mt-6 pt-6 border-t-4 border-black">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <form action={formAction} className="flex-1">
+                  <input type="hidden" name="articleContent" value={textForSummary} />
+                  <SubmitButton />
+                </form>
+                <Button onClick={() => setShareDialogOpen(true)} className="brutalist-button bg-primary text-primary-foreground hover:bg-primary/90 flex-1">
+                  <Share2 className="mr-2 h-6 w-6"/>
+                  Share Article
+                </Button>
+              </div>
+            </footer>
           </div>
-        )}
-      </div>
 
-       <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
-        <div className="brutalist-card !shadow-[6px_6px_0_#999] !p-4">
-          <p>
-            Created by Louati Mahdi
-          </p>
+          {state?.summary && (
+            <div className="brutalist-card mt-12" role="alert">
+              <header className="brutalist-header">
+                <div className="brutalist-icon">
+                  <Lightbulb stroke="white" fill="white" />
+                </div>
+                <h2 className="brutalist-title">AI Summary</h2>
+              </header>
+              <p className="brutalist-content text-lg">{state.summary}</p>
+            </div>
+          )}
         </div>
-      </footer>
 
-    </main>
+        <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
+          <div className="brutalist-card !shadow-[6px_6px_0_#999] !p-4">
+            <p>
+              Created by you!
+            </p>
+          </div>
+        </footer>
+
+      </main>
+      <ShareDialog 
+        open={isShareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        articleTitle={articleTitle}
+        articleContent={textForSummary}
+      />
+    </>
   );
 }
