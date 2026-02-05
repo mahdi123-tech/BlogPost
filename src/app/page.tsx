@@ -1,15 +1,25 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState, useState } from 'react';
+import { useEffect, useActionState, useState, useRef } from 'react';
 import { getSummaryAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Loader2, BrainCircuit, Lightbulb, Clipboard, Check, Share2 } from 'lucide-react';
+import {
+  Loader2,
+  BrainCircuit,
+  Lightbulb,
+  Clipboard,
+  Check,
+  Share2,
+  Maximize,
+  Minimize,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShareDialog } from '@/components/ShareDialog';
 import { ChatWidget } from '@/components/ChatWidget';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const articlePart1 = `
 <h2>The Dawn of a New Era</h2>
@@ -61,8 +71,10 @@ const articlePart2 = `
 `;
 
 const articleTitle = "The Brutalist's Guide to Modern AI";
-const textForSummary = ((articlePart1 + articlePart2).replace(/<[^>]*>?/gm, '')) + codeSnippet;
-
+const textForSummary =
+  articlePart1.replace(/<[^>]*>?/gm, '') +
+  articlePart2.replace(/<[^>]*>?/gm, '') +
+  codeSnippet;
 
 const initialState: {
   summary: string | null;
@@ -76,13 +88,19 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" aria-disabled={pending} className="brutalist-button brutalist-button-accent w-full">
+    <Button
+      type="submit"
+      aria-disabled={pending}
+      className="brutalist-button brutalist-button-accent w-full"
+    >
       {pending ? (
         <>
           <Loader2 className="mr-2 h-6 w-6 animate-spin" />
           Summarizing...
         </>
-      ) : 'Summarize with AI'}
+      ) : (
+        'Summarize with AI'
+      )}
     </Button>
   );
 }
@@ -110,7 +128,11 @@ function CodeSnippet({ code }: { code: string }) {
         className="absolute top-2 right-2 h-8 w-8 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
         aria-label="Copy code to clipboard"
       >
-        {copied ? <Check className="h-5 w-5 text-green-400" /> : <Clipboard className="h-5 w-5" />}
+        {copied ? (
+          <Check className="h-5 w-5 text-green-400" />
+        ) : (
+          <Clipboard className="h-5 w-5" />
+        )}
       </Button>
     </div>
   );
@@ -120,8 +142,36 @@ export default function Home() {
   const [state, formAction] = useActionState(getSummaryAction, initialState);
   const { toast } = useToast();
   const [isShareDialogOpen, setShareDialogOpen] = useState(false);
-  
-  const articleImage = PlaceHolderImages.find(img => img.id === 'ai-ml-abstract');
+  const articleRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const articleImage = PlaceHolderImages.find(
+    (img) => img.id === 'ai-ml-abstract'
+  );
+
+  const handleFullScreenToggle = () => {
+    if (!articleRef.current) return;
+
+    if (!document.fullscreenElement) {
+      articleRef.current.requestFullscreen().catch((err) => {
+        alert(
+          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+        );
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    return () =>
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+  }, []);
 
   useEffect(() => {
     if (state?.error) {
@@ -137,23 +187,42 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-background text-foreground font-body flex flex-col items-center p-4 sm:p-8">
         <div className="w-full max-w-4xl">
-          <div className="brutalist-card">
-            <header className="brutalist-header">
-              <div className="brutalist-icon">
-                <BrainCircuit stroke="white" fill="white" />
+          <div className="brutalist-card" ref={articleRef}>
+            <header className="brutalist-header justify-between items-start sm:items-center">
+              <div className="flex items-center gap-4">
+                <div className="brutalist-icon">
+                  <BrainCircuit stroke="white" fill="white" />
+                </div>
+                <h1 className="brutalist-title">{articleTitle}</h1>
               </div>
-              <h1 className="brutalist-title">{articleTitle}</h1>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <ThemeToggle />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleFullScreenToggle}
+                  className="brutalist-button !w-auto !h-auto !p-3 !bg-white !border-2 !shadow-[4px_4px_0_#000] hover:!shadow-[6px_6px_0_#000] active:!shadow-none"
+                  aria-label="Toggle fullscreen"
+                >
+                  <span className="sr-only">Toggle Fullscreen</span>
+                  {isFullScreen ? (
+                    <Minimize className="h-6 w-6 text-black" />
+                  ) : (
+                    <Maximize className="h-6 w-6 text-black" />
+                  )}
+                </Button>
+              </div>
             </header>
 
             {articleImage && (
               <div className="relative w-full h-48 sm:h-80 border-4 border-black my-6 shadow-[8px_8px_0_#000]">
-                  <Image 
-                    src={articleImage.imageUrl}
-                    alt={articleImage.description}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={articleImage.imageHint}
-                  />
+                <Image
+                  src={articleImage.imageUrl}
+                  alt={articleImage.description}
+                  fill
+                  className="object-cover"
+                  data-ai-hint={articleImage.imageHint}
+                />
               </div>
             )}
 
@@ -166,11 +235,18 @@ export default function Home() {
             <footer className="mt-6 pt-6 border-t-4 border-black">
               <div className="flex flex-col sm:flex-row gap-4">
                 <form action={formAction} className="flex-1">
-                  <input type="hidden" name="articleContent" value={textForSummary} />
+                  <input
+                    type="hidden"
+                    name="articleContent"
+                    value={textForSummary}
+                  />
                   <SubmitButton />
                 </form>
-                <Button onClick={() => setShareDialogOpen(true)} className="brutalist-button bg-primary text-primary-foreground hover:bg-primary/90 flex-1">
-                  <Share2 className="mr-2 h-6 w-6"/>
+                <Button
+                  onClick={() => setShareDialogOpen(true)}
+                  className="brutalist-button bg-primary text-primary-foreground hover:bg-primary/90 flex-1"
+                >
+                  <Share2 className="mr-2 h-6 w-6" />
                   Share Article
                 </Button>
               </div>
@@ -192,14 +268,11 @@ export default function Home() {
 
         <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
           <div className="brutalist-card !shadow-[6px_6px_0_#999] !p-4">
-            <p>
-              Created by you!
-            </p>
+            <p>Created by you!</p>
           </div>
         </footer>
-
       </main>
-      <ShareDialog 
+      <ShareDialog
         open={isShareDialogOpen}
         onOpenChange={setShareDialogOpen}
         articleTitle={articleTitle}
