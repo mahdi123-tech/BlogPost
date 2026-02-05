@@ -44,6 +44,7 @@ export async function chatWithArticle(
 
 const chatWithArticlePrompt = ai.definePrompt({
   name: 'chatWithArticlePrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: ChatWithArticleInputSchema},
   output: {schema: ChatWithArticleOutputSchema},
   prompt: `You are a helpful assistant for the "AI Insights Hub" blog. Your role is to answer user questions based *only* on the provided article content. Do not use any external knowledge. If the answer is not in the article, say that you cannot find the answer in the provided text.

@@ -37,6 +37,7 @@ export async function summarizeArticleContent(
 
 const summarizeArticleContentPrompt = ai.definePrompt({
   name: 'summarizeArticleContentPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: SummarizeArticleContentInputSchema},
   output: {schema: SummarizeArticleContentOutputSchema},
   prompt: `Summarize the following article content in a concise manner:\n\n{{{articleContent}}}`,
