@@ -14,6 +14,7 @@ import { MessageSquare, Send, Bot, User, Loader2 } from 'lucide-react';
 import { chatAction, type ChatMessage } from '@/app/actions';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { CopyButton } from '@/components/ui/copy-button';
 
 const initialChatState: {
   messages: ChatMessage[];
@@ -86,7 +87,7 @@ export function ChatWidget({ articleContent }: { articleContent: string }) {
                 <div
                     key={index}
                     className={cn(
-                    'flex items-start gap-3',
+                    'flex items-start gap-3 group',
                     message.role === 'user' ? 'justify-end' : 'justify-start'
                     )}
                 >
@@ -109,6 +110,13 @@ export function ChatWidget({ articleContent }: { articleContent: string }) {
                         <div className="bg-primary text-white rounded-full p-2 shrink-0">
                             <User className="h-5 w-5" />
                         </div>
+                    )}
+                    {message.role === 'model' && (
+                        <CopyButton
+                            content={message.content}
+                            copyMessage="AI response copied to clipboard."
+                            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity self-center shrink-0"
+                        />
                     )}
                 </div>
                 ))}
