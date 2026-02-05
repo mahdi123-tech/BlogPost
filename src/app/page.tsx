@@ -1,15 +1,15 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState } from 'react';
+import { useEffect, useActionState, useState } from 'react';
 import { getSummaryAction } from './actions';
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Loader2, BrainCircuit, Lightbulb, ExternalLink } from 'lucide-react';
+import { Loader2, BrainCircuit, Lightbulb, Clipboard, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const articleContent = `
+const articlePart1 = `
 <h2>The Dawn of a New Era</h2>
 <p>Machine Learning (ML) and Artificial Intelligence (AI) are no longer concepts confined to science fiction. They are rapidly becoming integral parts of our daily lives, powering everything from recommendation engines on our favorite streaming services to complex medical diagnoses. This post will give you a no-nonsense, brutalist overview of what's what in the world of modern AI.</p>
 
@@ -25,7 +25,9 @@ const articleContent = `
 
 <h3>A Glimpse into Code</h3>
 <p>Let's look at a very simple example of a supervised learning model using Python's popular <code>scikit-learn</code> library. Here, we'll train a model to classify iris flowers.</p>
-<pre><code>
+`;
+
+const codeSnippet = `
 # Import necessary libraries
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -49,11 +51,15 @@ predictions = model.predict(X_test)
 # Check accuracy
 accuracy = accuracy_score(y_test, predictions)
 print(f"Model Accuracy: {accuracy:.2f}")
-</code></pre>
+`;
 
+const articlePart2 = `
 <h3>The Future is Generative</h3>
 <p>The latest revolution is Generative AI. These are models, like Large Language Models (LLMs), that can create new content—text, images, music, and code. They are trained on vast amounts of data and learn the underlying patterns to a degree that they can generate novel, coherent, and often surprising outputs. This technology is what powers tools like ChatGPT and is fundamentally changing how we interact with information and create content.</p>
 `;
+
+const textForSummary = ((articlePart1 + articlePart2).replace(/<[^>]*>?/gm, '')) + codeSnippet;
+
 
 const initialState: {
   summary: string | null;
@@ -75,6 +81,35 @@ function SubmitButton() {
         </>
       ) : 'Summarize with AI'}
     </Button>
+  );
+}
+
+function CodeSnippet({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code.trim());
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+  };
+
+  return (
+    <div className="relative">
+      <pre>
+        <code>{code.trim()}</code>
+      </pre>
+      <Button
+        size="icon"
+        variant="ghost"
+        onClick={handleCopy}
+        className="absolute top-2 right-2 h-8 w-8 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+        aria-label="Copy code to clipboard"
+      >
+        {copied ? <Check className="h-5 w-5 text-green-400" /> : <Clipboard className="h-5 w-5" />}
+      </Button>
+    </div>
   );
 }
 
@@ -117,11 +152,15 @@ export default function Home() {
              </div>
           )}
 
-          <div className="brutalist-content" dangerouslySetInnerHTML={{ __html: articleContent }} />
+          <div className="brutalist-content">
+            <div dangerouslySetInnerHTML={{ __html: articlePart1 }} />
+            <CodeSnippet code={codeSnippet} />
+            <div dangerouslySetInnerHTML={{ __html: articlePart2 }} />
+          </div>
 
           <footer className="mt-6 pt-6 border-t-4 border-black">
             <form action={formAction}>
-              <input type="hidden" name="articleContent" value={articleContent.replace(/<[^>]*>?/gm, '')} />
+              <input type="hidden" name="articleContent" value={textForSummary} />
               <SubmitButton />
             </form>
           </footer>
