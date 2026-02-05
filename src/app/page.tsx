@@ -9,6 +9,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Loader2, BrainCircuit, Lightbulb, Clipboard, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShareDialog } from '@/components/ShareDialog';
+import { ChatWidget } from '@/components/ChatWidget';
 
 const articlePart1 = `
 <h2>The Dawn of a New Era</h2>
@@ -204,6 +205,7 @@ export default function Home() {
         articleTitle={articleTitle}
         articleContent={textForSummary}
       />
+      <ChatWidget articleContent={textForSummary} />
     </>
   );
 }
