@@ -114,7 +114,7 @@ export function ChatWidget({ articleContent }: { articleContent: string }) {
         <span className="sr-only">Open Chat</span>
       </Button>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-md brutalist-card !shadow-[10px_10px_0_#000] flex flex-col h-[70vh] max-h-[600px]">
+        <DialogContent className="sm:max-w-lg brutalist-card !shadow-[10px_10px_0_#000] flex flex-col h-[80vh] max-h-[700px]">
           <DialogHeader className="brutalist-header">
             <div className="brutalist-icon">
               <Bot stroke="white" fill="white" />
