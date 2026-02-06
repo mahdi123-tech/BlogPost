@@ -16,11 +16,18 @@ import {
   Maximize,
   Minimize,
   ChevronDown,
+  HelpCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShareDialog } from '@/components/ShareDialog';
 import { ChatWidget } from '@/components/ChatWidget';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const articlePart1 = `
 <h2>The Dawn of a New Era</h2>
@@ -285,6 +292,39 @@ export default function Home() {
               <p className="brutalist-content text-lg">{state.summary}</p>
             </div>
           )}
+
+          <div className="brutalist-card mt-12">
+            <header className="brutalist-header">
+              <div className="brutalist-icon">
+                <HelpCircle stroke="white" fill="white" />
+              </div>
+              <h2 className="brutalist-title">FAQs</h2>
+            </header>
+            <Accordion type="single" collapsible className="w-full mt-2">
+              <AccordionItem value="item-1" className="border-b-4 border-black">
+                <AccordionTrigger className="py-4 text-left font-black text-xl hover:no-underline uppercase">
+                  How can I contact the author?
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4 text-lg">
+                  Simply via email:{' '}
+                  <a
+                    href="mailto:louatimahdi390@gmail.com"
+                    className="font-bold underline text-primary hover:text-accent"
+                  >
+                    louatimahdi390@gmail.com
+                  </a>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2" className="border-none">
+                <AccordionTrigger className="py-4 text-left font-black text-xl hover:no-underline uppercase">
+                  Do you offer a free online consultation?
+                </AccordionTrigger>
+                <AccordionContent className="pt-2 pb-4 text-lg">
+                  Yes, sure!
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </div>
 
         <footer className="w-full max-w-4xl mt-12 text-center text-sm text-black/60">
