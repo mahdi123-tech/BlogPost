@@ -30,12 +30,29 @@ export function FeedbackDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Feedback submitted:', feedback);
+
+    if (!feedback.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Feedback Empty',
+        description: 'Please write your feedback before submitting.',
+      });
+      return;
+    }
+
+    const recipientEmail = 'louatimahdi390@gmail.com';
+    const subject = encodeURIComponent('New Feedback for AI Insights Hub');
+    const body = encodeURIComponent(feedback);
+
+    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+
     toast({
-      title: 'Feedback Submitted',
-      description: 'Thank you for helping us improve!',
+      title: 'Feedback Ready',
+      description: "Your email client is opening to send the feedback.",
     });
+
     onClose();
+    setFeedback('');
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -55,8 +72,8 @@ export function FeedbackDialog({
           <DialogTitle className="brutalist-title">Provide Feedback</DialogTitle>
         </DialogHeader>
         <DialogDescription className="text-black/80 -mt-4 mb-4">
-          Your feedback is valuable to us. Please let us know about your
-          experience.
+          Your feedback is valuable to us. Let us know about your experience.
+          Submitting will open your default email client.
         </DialogDescription>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
