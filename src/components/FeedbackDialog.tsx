@@ -34,7 +34,7 @@ export function FeedbackDialog({
   onOpenChange,
   onClose,
 }: FeedbackDialogProps) {
-  const { toast } = useToast();
+  const { toast, dismiss } = useToast();
   const [state, formAction, isPending] = useActionState(
     sendFeedbackAction,
     initialFeedbackState
@@ -43,13 +43,20 @@ export function FeedbackDialog({
 
   useEffect(() => {
     if (state.success) {
-      toast({
+      const { id } = toast({
         title: 'Feedback Sent!',
         description: 'Thank you for your valuable feedback.',
-        duration: 5000,
       });
+
+      const timer = setTimeout(() => {
+        dismiss(id);
+      }, 5000);
+
       onClose();
       formRef.current?.reset();
+      
+      return () => clearTimeout(timer);
+
     } else if (state.error) {
       toast({
         variant: 'destructive',
@@ -57,7 +64,7 @@ export function FeedbackDialog({
         description: state.error,
       });
     }
-  }, [state, toast, onClose]);
+  }, [state, toast, onClose, dismiss]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
