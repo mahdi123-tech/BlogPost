@@ -46,6 +46,7 @@ export function FeedbackDialog({
       toast({
         title: 'Feedback Sent!',
         description: 'Thank you for your valuable feedback.',
+        duration: 5000,
       });
       onClose();
       formRef.current?.reset();
