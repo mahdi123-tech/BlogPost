@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,8 +11,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { MessageSquareQuote, Send } from 'lucide-react';
+import { MessageSquareQuote, Send, Loader2 } from 'lucide-react';
 import { Textarea } from './ui/textarea';
+import { sendFeedbackAction } from '@/app/actions';
 
 interface FeedbackDialogProps {
   open: boolean;
@@ -20,40 +21,42 @@ interface FeedbackDialogProps {
   onClose: () => void;
 }
 
+const initialFeedbackState: {
+  success: boolean;
+  error: string | null;
+} = {
+  success: false,
+  error: null,
+};
+
 export function FeedbackDialog({
   open,
   onOpenChange,
   onClose,
 }: FeedbackDialogProps) {
-  const [feedback, setFeedback] = useState('');
   const { toast } = useToast();
+  const [state, formAction, isPending] = useActionState(
+    sendFeedbackAction,
+    initialFeedbackState
+  );
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!feedback.trim()) {
+  useEffect(() => {
+    if (state.success) {
+      toast({
+        title: 'Feedback Sent!',
+        description: 'Thank you for your valuable feedback.',
+      });
+      onClose();
+      formRef.current?.reset();
+    } else if (state.error) {
       toast({
         variant: 'destructive',
-        title: 'Feedback Empty',
-        description: 'Please write your feedback before submitting.',
+        title: 'Submission Failed',
+        description: state.error,
       });
-      return;
     }
-
-    const recipientEmail = 'louatimahdi390@gmail.com';
-    const subject = encodeURIComponent('New Feedback for AI Insights Hub');
-    const body = encodeURIComponent(feedback);
-
-    window.location.href = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
-
-    toast({
-      title: 'Feedback Ready',
-      description: "Your email client is opening to send the feedback.",
-    });
-
-    onClose();
-    setFeedback('');
-  };
+  }, [state, toast, onClose]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -73,30 +76,40 @@ export function FeedbackDialog({
         </DialogHeader>
         <DialogDescription className="text-black/80 -mt-4 mb-4">
           Your feedback is valuable to us. Let us know about your experience.
-          Submitting will open your default email client.
         </DialogDescription>
-        <form onSubmit={handleSubmit}>
+        <form ref={formRef} action={formAction}>
           <div className="grid gap-4 py-4">
             <Textarea
               id="feedback"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
+              name="feedback"
               placeholder="Tell us what you think..."
               className="border-2 border-black focus-visible:ring-accent min-h-[100px]"
+              disabled={isPending}
             />
           </div>
           <DialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">
             <Button
               type="submit"
               className="brutalist-button brutalist-button-accent w-full"
+              disabled={isPending}
             >
-              <Send className="mr-2 h-5 w-5" />
-              Submit Feedback
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-5 w-5" />
+                  Submit Feedback
+                </>
+              )}
             </Button>
             <Button
               type="button"
               onClick={onClose}
               className="brutalist-button bg-primary text-primary-foreground hover:bg-primary/90 w-full"
+              disabled={isPending}
             >
               Skip
             </Button>
