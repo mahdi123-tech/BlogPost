@@ -1,4 +1,4 @@
-# Firebase Studio
+# Powered By Louati Mahdi
 
 This is a NextJS starter in Firebase Studio.
 
