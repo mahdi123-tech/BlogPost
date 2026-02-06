@@ -142,7 +142,7 @@ export async function sendFeedbackAction(
 
   const mailOptions = {
     from: senderEmail,
-    to: senderEmail, // Sending to yourself
+    to: 'louatimahdi390@gmail.com',
     subject: 'New Feedback for AI Insights Hub',
     text: feedback,
     html: `<p>You have received new feedback:</p><p><strong>${feedback}</strong></p>`,
